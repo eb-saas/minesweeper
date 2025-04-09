@@ -1,0 +1,51 @@
+:root {
+    background-color: #ffff55;
+    --cell-size: 1.75;
+}
+
+table, tr, td, th {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+td {
+    height: calc(var(--cell-size)*1em);
+    width: calc(var(--cell-size)*1em);
+}
+
+.mine_0 {
+    color: #000000;
+}
+
+.mine_1 {
+    color: #0000ff;
+}
+
+.mine_2 {
+    color: #008200;
+}
+
+.mine_3 {
+    color: #fe0000;
+}
+
+.mine_4 {
+    color: #000084;
+}
+
+.mine_5 {
+    color: #840000;
+}
+
+.mine_6 {
+    color: #008284;
+}
+
+.mine_7 {
+    color: #840084;
+}
+
+.mine_8 {
+    color: #757575;
+}
