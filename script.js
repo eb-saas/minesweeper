@@ -3,13 +3,17 @@ const inputHeight = document.getElementById("grid_height");
 const inputWidth = document.getElementById("grid_width");
 const inputCellZoom = document.getElementById("cell_zoom")
 const cssRoot = document.querySelector(":root");
+const inputMineCount = document.getElementById("mine_count");
 
 var height = parseInt(inputHeight.value);
 var width = parseInt(inputWidth.value);
+var mineCount = parseInt(inputMineCount.value);
 var cellSize = getComputedStyle(cssRoot).getPropertyValue("--cell-size");
 
-function resizeGrid() {
+function updateGrid() {
     mineGrid.innerHTML = "";
+    let remainingMines = mineCount;
+
     for (let i = 0; i < height; i++) {
         let newRow = document.createElement("tr");
         newRow.setAttribute("data-row", `${i}`);
@@ -17,29 +21,31 @@ function resizeGrid() {
         mineGrid.appendChild(newRow);
         for (let j = 0; j < width; j++) {
             let newCell = document.createElement("td");
-            let newCellIsMine = Math.random()<50/(height*width); //Need a better way to spefify how may mines are in the grid
+            let newCellIsMine = false;
+            if (remainingMines > 0) {
+                newCellIsMine = Math.random()<(remainingMines/(width*(height-i)-j));
+                if (newCellIsMine) { remainingMines-- };
+            }
             newCell.setAttribute("data-col", `${j}`);
             newCell.setAttribute("data-mine", `${newCellIsMine}`);
-
-            if (newCellIsMine) {
-                newCell.innerText = "!"
-            }
 
             newRow.appendChild(newCell);
         };
     };
+
+    numberGrid();
 };
 
-resizeGrid();
+updateGrid();
 
 inputHeight.addEventListener("input", () => {
     height = parseInt(inputHeight.value);
-    resizeGrid();
+    updateGrid();
 });
 
 inputWidth.addEventListener("input", () => {
     width = parseInt(inputWidth.value);
-    resizeGrid();
+    updateGrid();
 });
 
 inputCellZoom.value = cellSize;
@@ -48,8 +54,14 @@ inputCellZoom.addEventListener("input", () => {
     cssRoot.style.setProperty("--cell-size", cellSize);
 })
 
+inputMineCount.addEventListener("input", () => {
+    mineCount = parseInt(inputMineCount.value);
+    updateGrid()
+});
+
 function selectCellCoord(selRow, selCol) {
     let currentRow = document.querySelector(`[data-row="${selRow}"]`);
+    if (currentRow == null) { return false; };
     let selectedCell = currentRow.querySelector(`[data-col="${selCol}"]`);
 
     if (selectedCell == null) { return false; };
@@ -61,7 +73,7 @@ function numberGrid() {
         for (let col = 0; col < width; col++) {
             let currentCell = selectCellCoord(row, col);
             if (currentCell.getAttribute("data-mine") == "true") {
-                currentCell.style.backgroundColor = "red";
+                console.log(row, col, "is a mine");
             } else {
                 let surroundingMineSum = 0;
 
@@ -69,16 +81,61 @@ function numberGrid() {
                     for (let j = 0; j < 3; j++) {
                         let adjacentCell = selectCellCoord(row+(i-1), col+(j-1));
                         if (adjacentCell == false) {
-                            break;
                         } else if (adjacentCell.getAttribute("data-mine") == "true") {
                             surroundingMineSum++;
                         }
                     }
                 }
 
-                currentCell.innerText = surroundingMineSum;
-                currentCell.classList.add("mine_"+surroundingMineSum)
-            }            
+                console.log(row, col, "is not mine, sum:", surroundingMineSum);
+                currentCell.setAttribute("data-mine-sum", surroundingMineSum);
+            }  
+            
+            currentCell.classList.add("hidden_cell");
+
+            currentCell.addEventListener("click", () => {
+                revealCell(row, col);
+            })
+        }
+    }
+}
+
+function setDifficulty(newHeight, newWidth, mines) {
+    inputHeight.value = newHeight;
+    inputWidth.value = newWidth;
+    inputMineCount.value = mines;
+
+    height = newHeight;
+    width = newWidth;
+    mineCount = mines;
+
+    updateGrid();
+}
+
+function revealCell(cellRow, cellCol) {
+    clickedCell = selectCellCoord(cellRow, cellCol);
+    if (clickedCell == false) { return false; };
+    if (clickedCell.hasAttribute("data-clicked")) { return false; };
+    clickedCell.setAttribute("data-clicked", true);
+
+    clickedCell.classList = "";
+
+    if (clickedCell.getAttribute("data-mine") == "true") {
+        clickedCell.innerText = "!";
+        clickedCell.classList.add("mine");
+    } else {
+        cellMineSum = parseInt(clickedCell.getAttribute("data-mine-sum"));
+        clickedCell.innerText = cellMineSum;
+        clickedCell.classList.add("mine_"+cellMineSum);
+        if (cellMineSum == 0) {
+            revealCell(cellRow-1, cellCol-1);
+            revealCell(cellRow, cellCol-1);
+            revealCell(cellRow+1, cellCol-1);
+            revealCell(cellRow-1, cellCol);
+            revealCell(cellRow+1, cellCol);
+            revealCell(cellRow-1, cellCol+1);
+            revealCell(cellRow, cellCol+1);
+            revealCell(cellRow+1, cellCol+1);
         }
     }
 }
