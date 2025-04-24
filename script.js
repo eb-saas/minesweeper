@@ -28,6 +28,7 @@ function updateGrid() {
             }
             newCell.setAttribute("data-col", `${j}`);
             newCell.setAttribute("data-mine", `${newCellIsMine}`);
+            newCell.setAttribute("data-flagged", "false")
 
             newRow.appendChild(newCell);
         };
@@ -73,7 +74,6 @@ function numberGrid() {
         for (let col = 0; col < width; col++) {
             let currentCell = selectCellCoord(row, col);
             if (currentCell.getAttribute("data-mine") == "true") {
-                console.log(row, col, "is a mine");
             } else {
                 let surroundingMineSum = 0;
 
@@ -87,7 +87,6 @@ function numberGrid() {
                     }
                 }
 
-                console.log(row, col, "is not mine, sum:", surroundingMineSum);
                 currentCell.setAttribute("data-mine-sum", surroundingMineSum);
             }  
             
@@ -95,6 +94,10 @@ function numberGrid() {
 
             currentCell.addEventListener("click", () => {
                 revealCell(row, col);
+            })
+            currentCell.addEventListener("contextmenu", () => {
+                event.preventDefault();
+                flagCell(row, col);
             })
         }
     }
@@ -116,6 +119,7 @@ function revealCell(cellRow, cellCol) {
     clickedCell = selectCellCoord(cellRow, cellCol);
     if (clickedCell == false) { return false; };
     if (clickedCell.hasAttribute("data-clicked")) { return false; };
+    if (clickedCell.getAttribute("data-flagged") == "true") { return false; };
     clickedCell.setAttribute("data-clicked", true);
 
     clickedCell.classList = "";
@@ -138,4 +142,22 @@ function revealCell(cellRow, cellCol) {
             revealCell(cellRow+1, cellCol+1);
         }
     }
+}
+
+
+function flagCell(cellRow, cellCol) {
+    clickedCell = selectCellCoord(cellRow, cellCol);
+    if (clickedCell == false) { return false; };
+    if (clickedCell.hasAttribute("data-clicked")) { return false; };
+
+    if (clickedCell.getAttribute("data-flagged") == "false") {
+        clickedCell.setAttribute("data-flagged", "true");
+        clickedCell.innerText = "X";
+        clickedCell.classList.add("flag");
+    } else {
+        clickedCell.setAttribute("data-flagged", "false");
+        clickedCell.innerText = "";
+        clickedCell.classList.remove("flag");
+    }
+    
 }

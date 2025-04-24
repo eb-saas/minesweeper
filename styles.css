@@ -61,10 +61,14 @@ td {
 }
 
 .mine {
-    background-color: #ff0000;
+    background-color: #ff5555;
 }
 
 .hidden_cell {
     color: #000000;
     background-color: #c6c6c6;
+}
+
+.flag {
+    color: #000000;
 }
