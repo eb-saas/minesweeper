@@ -1,7 +1,9 @@
 const mineGrid = document.getElementById("minegrid");
 const inputHeight = document.getElementById("grid_height");
 const inputWidth = document.getElementById("grid_width");
-const inputCellZoom = document.getElementById("cell_zoom")
+const inputCellZoom = document.getElementById("cell_zoom");
+const inputKeybindReveal = document.getElementById("reveal_keybind");
+const inputKeybindFlag = document.getElementById("flag_keybind")
 const cssRoot = document.querySelector(":root");
 const inputMineCount = document.getElementById("mine_count");
 
@@ -9,6 +11,10 @@ var height = parseInt(inputHeight.value);
 var width = parseInt(inputWidth.value);
 var mineCount = parseInt(inputMineCount.value);
 var cellSize = getComputedStyle(cssRoot).getPropertyValue("--cell-size");
+var hoveredCol = undefined;
+var hoveredRow = undefined;
+var keybindReveal = inputKeybindReveal.value;
+var keybindFlag = inputKeybindFlag.value;
 
 function updateGrid() {
     mineGrid.innerHTML = "";
@@ -161,3 +167,18 @@ function flagCell(cellRow, cellCol) {
     }
     
 }
+
+
+document.addEventListener('mousemove', () => {
+    console.clear();
+    hoveredCol = document.elementFromPoint(event.clientX, event.clientY).getAttribute("data-col")
+    hoveredRow = document.elementFromPoint(event.clientX, event.clientY).parentElement.getAttribute("data-row")
+});
+
+document.addEventListener('keydown', () => {
+    if (event.key == keybindFlag) {
+        flagCell(hoveredRow, hoveredCol);
+    } else if (event.key == keybindReveal) {
+        selectCellCoord(hoveredRow, hoveredCol).click();
+    }
+})
