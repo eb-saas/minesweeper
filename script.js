@@ -131,7 +131,7 @@ function revealCell(cellRow, cellCol) {
     clickedCell.classList = "";
 
     if (clickedCell.getAttribute("data-mine") == "true") {
-        clickedCell.innerText = "!";
+        clickedCell.innerText = "X";
         clickedCell.classList.add("mine");
     } else {
         cellMineSum = parseInt(clickedCell.getAttribute("data-mine-sum"));
