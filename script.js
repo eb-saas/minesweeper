@@ -4,6 +4,7 @@ const inputWidth = document.getElementById("grid_width");
 const inputCellZoom = document.getElementById("cell_zoom");
 const inputKeybindReveal = document.getElementById("reveal_keybind");
 const inputKeybindFlag = document.getElementById("flag_keybind")
+const inputKeybindRestart = document.getElementById("restart_keybind")
 const cssRoot = document.querySelector(":root");
 const inputMineCount = document.getElementById("mine_count");
 
@@ -15,6 +16,7 @@ var hoveredCol = undefined;
 var hoveredRow = undefined;
 var keybindReveal = inputKeybindReveal.value;
 var keybindFlag = inputKeybindFlag.value;
+var keybindRestart = inputKeybindRestart.value;
 
 function updateGrid() {
     mineGrid.innerHTML = "";
@@ -64,6 +66,18 @@ inputCellZoom.addEventListener("input", () => {
 inputMineCount.addEventListener("input", () => {
     mineCount = parseInt(inputMineCount.value);
     updateGrid()
+});
+
+inputKeybindFlag.addEventListener("input", () => {
+    keybindFlag = inputKeybindFlag.value;
+});
+
+inputKeybindReveal.addEventListener("input", () => {
+    keybindReveal = inputKeybindReveal.value;
+});
+
+inputKeybindRestart.addEventListener("input", () => {
+    keybindRestart = inputKeybindRestart.value;
 });
 
 function selectCellCoord(selRow, selCol) {
@@ -170,15 +184,17 @@ function flagCell(cellRow, cellCol) {
 
 
 document.addEventListener('mousemove', () => {
-    console.clear();
     hoveredCol = document.elementFromPoint(event.clientX, event.clientY).getAttribute("data-col")
     hoveredRow = document.elementFromPoint(event.clientX, event.clientY).parentElement.getAttribute("data-row")
 });
 
 document.addEventListener('keydown', () => {
+    console.log(event.key)
     if (event.key == keybindFlag) {
         flagCell(hoveredRow, hoveredCol);
     } else if (event.key == keybindReveal) {
         selectCellCoord(hoveredRow, hoveredCol).click();
+    } else if (event.key == keybindRestart) {
+        updateGrid()
     }
 })
